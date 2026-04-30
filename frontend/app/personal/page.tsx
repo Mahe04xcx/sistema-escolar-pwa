@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Trash2, FileText, Search, Contact } from 'lucide-react'; 
 import Swal from 'sweetalert2';
+import API_URL from '@/lib/api';
 
 interface Docente {
   id: number;
@@ -20,7 +21,7 @@ export default function ListaPersonal() {
   useEffect(() => {
     const fetchDocentes = async () => {
       try {
-        const res = await axios.get('http://127.0.0.1:8000/personal/listar');
+        const res = await axios.get(`${API_URL}/personal/listar`);
         setDocentes(res.data);
       } catch (err: unknown) {
         console.error("Error al cargar", err);
@@ -41,9 +42,9 @@ export default function ListaPersonal() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`http://127.0.0.1:8000/personal/eliminar/${id}`);
+          await axios.delete(`${API_URL}/personal/eliminar/${id}`);
           Swal.fire('Eliminado', 'El registro ha sido borrado', 'success');
-          const res = await axios.get('http://127.0.0.1:8000/personal/listar');
+          const res = await axios.get(`${API_URL}/personal/listar`);
           setDocentes(res.data);
         } catch (err: unknown) {
           Swal.fire('Error', 'No se pudo eliminar', 'error');
@@ -54,7 +55,7 @@ export default function ListaPersonal() {
 
   // Función para abrir el PDF en una pestaña nueva
   const descargarPDF = (id: number) => {
-    window.open(`http://127.0.0.1:8000/personal/pdf/${id}`, '_blank');
+    window.open(`${API_URL}/personal/pdf/${id}`, '_blank');
   };
 
   return (

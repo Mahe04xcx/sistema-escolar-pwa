@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { UserCog, Trash2, Edit3, Save, X, Search } from 'lucide-react';
+import API_URL from '@/lib/api';
 
 interface Docente {
   id: number;
@@ -18,7 +19,7 @@ export default function GestionPersonal() {
 
   const cargarPersonal = async () => {
     try {
-      const res = await axios.get('http://127.0.0.1:8000/personal/listar');
+      const res = await axios.get(`${API_URL}/personal/listar`);
       setPersonal(res.data);
     } catch (err) {
       console.error("Error al cargar lista", err);
@@ -42,7 +43,7 @@ export default function GestionPersonal() {
 
   const guardarCambios = async (id: number) => {
     try {
-      await axios.put(`http://127.0.0.1:8000/personal/actualizar/${id}`, null, {
+      await axios.put(`${API_URL}/personal/actualizar/${id}`, null, {
         params: {
           nombre: tempData.nombre_completo,
           numero: tempData.numero_empleado
@@ -70,7 +71,7 @@ export default function GestionPersonal() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`http://127.0.0.1:8000/personal/eliminar/${id}`);
+          await axios.delete(`${API_URL}/personal/eliminar/${id}`);
           Swal.fire('Eliminado', 'El registro ha sido borrado.', 'success');
           cargarPersonal();
         } catch (err) {

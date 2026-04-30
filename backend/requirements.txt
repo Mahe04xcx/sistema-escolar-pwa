@@ -1,8 +1,11 @@
 fastapi
-uvicorn
+uvicorn[standard]
+gunicorn
 sqlalchemy
+psycopg2-binary
 mysql-connector-python
 passlib[bcrypt]
 python-jose[cryptography]
 pyotp
 python-multipart
+reportlab

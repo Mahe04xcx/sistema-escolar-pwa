@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
 import axios from 'axios';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import API_URL from '@/lib/api';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -34,7 +35,7 @@ export default function Estadisticas() {
   ];
 
   useEffect(() => {
-    axios.get('http://127.0.0.1:8000/estadisticas/general')
+    axios.get(`${API_URL}/estadisticas/general`)
       .then(res => {
         const labels = Object.keys(res.data.distribucion);
         const values = Object.values(res.data.distribucion) as number[];

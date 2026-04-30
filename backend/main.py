@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, Depends, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
@@ -14,7 +15,17 @@ import os
 import io
 
 # 1. Configuración de Base de Datos
-DATABASE_URL = "mysql+mysqlconnector://root:Mahemahe2004@localhost/sistema_escolar"
+# En producción, usa la variable de entorno DATABASE_URL (PostgreSQL de Render)
+# En desarrollo local, usa MySQL como antes
+DATABASE_URL = os.environ.get(
+    "DATABASE_URL",
+    "mysql+mysqlconnector://root:Mahemahe2004@localhost/sistema_escolar"
+)
+
+# Render usa "postgres://" pero SQLAlchemy necesita "postgresql://"
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
 engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
@@ -256,3 +267,39 @@ def analizar_riesgo_general(db: Session = Depends(get_db)):
            "identificar posibles causas de desmotivación o problemas externos que afecten el desempeño.")
     
     return {"diagnostico": msg}
+
+# --- V. SERVIR FRONTEND ESTÁTICO (para deploy en Render) ---
+# El frontend compilado (next export) se sirve desde aquí
+
+FRONTEND_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "frontend", "out")
+
+if os.path.isdir(FRONTEND_DIR):
+    # Servir archivos estáticos de Next.js (_next/static, etc.)
+    next_static = os.path.join(FRONTEND_DIR, "_next")
+    if os.path.isdir(next_static):
+        app.mount("/_next", StaticFiles(directory=next_static), name="next_static")
+
+    # Catch-all: servir las páginas HTML del frontend
+    @app.get("/{full_path:path}")
+    async def serve_frontend(full_path: str):
+        # 1. Archivo exacto (favicon.ico, manifest.json, sw.js, etc.)
+        file_path = os.path.join(FRONTEND_DIR, full_path)
+        if os.path.isfile(file_path):
+            return FileResponse(file_path)
+        
+        # 2. Directorio con index.html (ej: /login/ -> /login/index.html)
+        index_path = os.path.join(FRONTEND_DIR, full_path, "index.html")
+        if os.path.isfile(index_path):
+            return FileResponse(index_path)
+        
+        # 3. Archivo .html (ej: /login -> /login.html)
+        html_path = os.path.join(FRONTEND_DIR, f"{full_path}.html")
+        if os.path.isfile(html_path):
+            return FileResponse(html_path)
+        
+        # 4. Fallback a index.html principal
+        root_index = os.path.join(FRONTEND_DIR, "index.html")
+        if os.path.isfile(root_index):
+            return FileResponse(root_index)
+        
+        raise HTTPException(status_code=404, detail="Página no encontrada")

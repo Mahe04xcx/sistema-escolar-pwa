@@ -3,6 +3,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { UserPlus, Fingerprint, Briefcase, Contact } from 'lucide-react';
+import API_URL from '@/lib/api';
 
 export default function RegistroPersonal() {
   const [form, setForm] = useState({
@@ -34,7 +35,7 @@ export default function RegistroPersonal() {
     setLoading(true);
     try {
       // 3. Envío con Headers de Autorización
-      await axios.post('http://127.0.0.1:8000/personal/crear', null, {
+      await axios.post(`${API_URL}/personal/crear`, null, {
         params: {
           nombre: form.nombre,
           num_empleado: form.num_empleado,

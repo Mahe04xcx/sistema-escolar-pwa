@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { BrainCircuit, ShieldAlert, Loader2, Target, Lightbulb, TrendingUp } from 'lucide-react';
+import API_URL from '@/lib/api';
 
 export default function AnalisisIA() {
   const [analisis, setAnalisis] = useState("");
@@ -12,7 +13,7 @@ export default function AnalisisIA() {
     setAnalisis("");
     try {
       // Simulación de delay para dar peso al análisis de la IA
-      const res = await axios.get('http://127.0.0.1:8000/ia/analizar-riesgo');
+      const res = await axios.get(`${API_URL}/ia/analizar-riesgo`);
       setAnalisis(res.data.diagnostico);
     } catch (err) {
       setAnalisis("Error crítico: No se pudo conectar con Gemini 3 Flash. Verifica el servidor backend.");

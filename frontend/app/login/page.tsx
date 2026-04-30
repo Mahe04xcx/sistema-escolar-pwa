@@ -3,6 +3,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { ShieldCheck, Lock, User, KeyRound } from 'lucide-react';
+import API_URL from '@/lib/api';
 
 export default function LoginSeguro() {
   const [paso, setPaso] = useState(1);
@@ -21,7 +22,7 @@ export default function LoginSeguro() {
         setPaso(2);
       } else {
         // Verificación final del código de 6 dígitos de tu celular
-        const res = await axios.post('http://127.0.0.1:8000/auth/verificar-2fa', {
+        const res = await axios.post(`${API_URL}/auth/verificar-2fa`, {
           usuario: form.usuario,
           token_otp: form.token
         });

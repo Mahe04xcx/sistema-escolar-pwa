@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import API_URL from '@/lib/api';
 
 interface Docente {
   id: number;
@@ -18,7 +19,7 @@ export default function RegistroInasistencias() {
   });
 
   useEffect(() => {
-    axios.get('http://127.0.0.1:8000/personal/listar')
+    axios.get(`${API_URL}/personal/listar`)
       .then(res => setDocentes(res.data))
       .catch((err: unknown) => {
         console.error("Error cargando docentes:", err);
@@ -40,10 +41,10 @@ export default function RegistroInasistencias() {
         obs: 'Sin observaciones'
       });
 
-      const res = await axios.post(`http://127.0.0.1:8000/inasistencias/registrar?${params.toString()}`);
+      const res = await axios.post(`${API_URL}/inasistencias/registrar?${params.toString()}`);
       
       if (res.data && res.data.id) {
-        window.open(`http://127.0.0.1:8000/inasistencias/reporte/${res.data.id}`, '_blank');
+        window.open(`${API_URL}/inasistencias/reporte/${res.data.id}`, '_blank');
         Swal.fire('Éxito', 'Reporte generado', 'success');
       }
     } catch (err: unknown) {
