@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { UserPlus, CalendarX, BarChart3, BrainCircuit } from 'lucide-react';
 
@@ -14,8 +15,20 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export default function Home() {
+  const router = useRouter();
+  const [autenticado, setAutenticado] = useState(false);
   // Cambiamos 'any' por nuestro tipo personalizado o null
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+
+  // Verificar si hay sesión activa, si no, redirigir a login
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.replace('/login');
+    } else {
+      setAutenticado(true);
+    }
+  }, [router]);
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -48,6 +61,11 @@ export default function Home() {
     { title: "Estadísticas", path: "/estadisticas", icon: <BarChart3 size={40} />, color: "bg-[#800020]" },
     { title: "Análisis IA", path: "/ia-analisis", icon: <BrainCircuit size={40} />, color: "bg-[#001F3F]" }
   ];
+
+  // Mientras verifica autenticación, no mostrar nada
+  if (!autenticado) {
+    return <div className="min-h-screen bg-zinc-50" />;
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-zinc-50 font-sans">

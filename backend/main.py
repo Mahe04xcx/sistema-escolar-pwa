@@ -64,6 +64,44 @@ class Inasistencia(Base):
 
 Base.metadata.create_all(bind=engine)
 
+# --- AUTO-CREAR ADMIN SI NO EXISTEN USUARIOS ---
+def init_admin():
+    """Crea un usuario admin por defecto si la tabla está vacía."""
+    db = SessionLocal()
+    try:
+        count = db.query(User).count()
+        if count == 0:
+            import bcrypt
+            admin_user = os.environ.get("ADMIN_USER", "admin")
+            admin_pass = os.environ.get("ADMIN_PASS", "admin123")
+            secret = pyotp.random_base32()
+            
+            password_bytes = admin_pass.encode('utf-8')
+            salt = bcrypt.gensalt()
+            hashed_pw = bcrypt.hashpw(password_bytes, salt).decode('utf-8')
+            
+            nuevo = User(
+                nombre_usuario=admin_user,
+                password_hash=hashed_pw,
+                rol="admin",
+                otp_secret=secret
+            )
+            db.add(nuevo)
+            db.commit()
+            print("=" * 50)
+            print(f"ADMIN CREADO AUTOMÁTICAMENTE")
+            print(f"Usuario: {admin_user}")
+            print(f"OTP Secret: {secret}")
+            print(f"Agrega este secret a Google Authenticator")
+            print("=" * 50)
+    except Exception as e:
+        print(f"Error al crear admin: {e}")
+        db.rollback()
+    finally:
+        db.close()
+
+init_admin()
+
 app = FastAPI()
 
 app.add_middleware(
