@@ -1,0 +1,23 @@
+{
+  "name": "Sistema Control Escolar",
+  "short_name": "ControlEscolar",
+  "description": "Panel de Gestión Administrativa e Inasistencias",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#800020",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/gestion.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
